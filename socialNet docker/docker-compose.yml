@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+    web:
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+            - ./app:/app
+    php:
+        build:
+            context: .
+            dockerfile: PHP.Dockerfile
+        volumes:
+            - ./app:/app
+    postgres:
+        image: postgres:latest
+        build: 
+            context: .
+            dockerfile: DB.Dockerfile
+        restart: always
+        volumes:
+            - ./dbScript.sql:/docker-entrypoint-initdb.d/10-dbScript.sql
+            - ./postgres-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: "socialNet"
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "postgres"
+        logging:
+          options:
+            max-size: 10m
+            max-file: "3"
+        ports:
+            - '5438:5432'
+          
+
+volumes:
+    postgresData: {} 
+    
